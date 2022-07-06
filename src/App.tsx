@@ -3,6 +3,8 @@ import Dashboard from "./Dashboard/Dashboard";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import CalendarComponent from "./Calendar/CalendarContent";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   const mdTheme = createTheme({

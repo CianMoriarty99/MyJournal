@@ -16,9 +16,18 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { mainListItems, secondaryListItems } from "../Shared/ListItems";
 import Drawer from "../Shared/Drawer";
 import AppBar from "../Shared/AppBar";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import { Calendar, Event, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Popup from "reactjs-popup";
+import Modal from "react-bootstrap/Modal";
+import "reactjs-popup/dist/index.css";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/esm/Form";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { TextField } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider/LocalizationProvider";
 
 // Setup the localizer by providing the moment (or globalize, or Luxon) Object
 // to the correct localizer.
@@ -206,115 +215,177 @@ function CalendarComponent() {
     },
   ];
 
+  // const openModal = (data: any) => {
+  //   setPopupData(data);
+  // };
+
   const [open, setOpen] = React.useState(true);
+  const [openModal, setOpenModal] = React.useState(true);
+  const [modalData, setModalData] = React.useState<Event>();
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar position="absolute" open={open}>
-        <Toolbar
-          sx={{
-            pr: "24px", // keep right padding when drawer closed
-          }}
-        >
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={toggleDrawer}
+    <React.Fragment>
+      <Box sx={{ display: "flex" }}>
+        <CssBaseline />
+        <AppBar position="absolute" open={open}>
+          <Toolbar
             sx={{
-              marginRight: "36px",
-              ...(open && { display: "none" }),
+              pr: "24px", // keep right padding when drawer closed
             }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            sx={{ flexGrow: 1 }}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: "36px",
+                ...(open && { display: "none" }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              sx={{ flexGrow: 1 }}
+            >
+              Calendar
+            </Typography>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" open={open}>
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
           >
-            Calendar
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer variant="permanent" open={open}>
-        <Toolbar
+            <IconButton onClick={toggleDrawer}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </Toolbar>
+          <Divider />
+          <List component="nav">
+            {mainListItems}
+            <Divider sx={{ my: 1 }} />
+            {secondaryListItems}
+          </List>
+        </Drawer>
+        <Box
+          component="main"
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            px: [1],
+            backgroundColor: (theme) =>
+              theme.palette.mode === "light"
+                ? theme.palette.grey[100]
+                : theme.palette.grey[900],
+            flexGrow: 1,
+            height: "100vh",
+            overflow: "auto",
           }}
         >
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Toolbar>
-        <Divider />
-        <List component="nav">
-          {mainListItems}
-          <Divider sx={{ my: 1 }} />
-          {secondaryListItems}
-        </List>
-      </Drawer>
-      <Box
-        component="main"
-        sx={{
-          backgroundColor: (theme) =>
-            theme.palette.mode === "light"
-              ? theme.palette.grey[100]
-              : theme.palette.grey[900],
-          flexGrow: 1,
-          height: "100vh",
-          overflow: "auto",
-        }}
-      >
-        <Toolbar />
+          <Toolbar />
 
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid xs={12}>
-              <Paper
-                elevation={3}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  height: 1000,
-                }}
-              >
-                <Calendar
-                  localizer={localizer}
-                  events={myEventsList}
-                  startAccessor="start"
-                  endAccessor="end"
-                  style={{ height: "100vh" }}
-                />
-              </Paper>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+              {/* Chart */}
+              <Grid xs={12}>
+                <Paper
+                  elevation={3}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    height: 1000,
+                  }}
+                >
+                  <Modal show={openModal} centered>
+                    <Modal.Header closeButton>
+                      <Modal.Title>{modalData?.title}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <Form>
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                          <DateTimePicker
+                            className="form"
+                            label="Start time"
+                            value={modalData?.start}
+                            onChange={() => {}}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                          <DateTimePicker
+                            className="form"
+                            label="End time"
+                            value={modalData?.end}
+                            onChange={() => {}}
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </LocalizationProvider>
+                        <Form.Group
+                          className="mb-3"
+                          controlId="exampleForm.ControlTextarea1"
+                        >
+                          <Form.Label>Example textarea</Form.Label>
+                          <Form.Control as="textarea" rows={3} />
+                        </Form.Group>
+                      </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        variant="secondary"
+                        onClick={() => {
+                          setOpenModal(false);
+                        }}
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={() => {
+                          setOpenModal(false);
+                        }}
+                      >
+                        Save Changes
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+                  <Calendar
+                    localizer={localizer}
+                    events={myEventsList}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: "100vh" }}
+                    onSelectEvent={(data: Event) => {
+                      setModalData(data);
+                      setOpenModal(true);
+                    }}
+                  />
+                </Paper>
+              </Grid>
+              {/* Recent Orders */}
+              <Grid item xs={12}>
+                <Paper
+                  elevation={3}
+                  sx={{ p: 2, display: "flex", flexDirection: "column" }}
+                ></Paper>
+              </Grid>
             </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper
-                elevation={3}
-                sx={{ p: 2, display: "flex", flexDirection: "column" }}
-              ></Paper>
-            </Grid>
-          </Grid>
-        </Container>
+          </Container>
+        </Box>
       </Box>
-    </Box>
+    </React.Fragment>
   );
 }
 

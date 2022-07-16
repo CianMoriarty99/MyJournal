@@ -1,6 +1,6 @@
 # MyJournal
 
-MyJournal is a web app written in ReactJS and TypeScript that helps you to keep track of your daily activities and manage your schedule.
+MyJournal is a web app written in ReactJS and TypeScript that helps you to keep track of your daily activities and view trends over time.
 
 # Installation
 

@@ -31,3 +31,8 @@
   border-radius: 18px;
   border: 1px solid #cfcece;
 }
+
+.App {
+  height: 500px;
+  width: 500px;
+}
